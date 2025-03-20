@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode"; // Import jwt-decode
 export const AuthContext = createContext();
 
 const BASE_URL ="https://admin-dashboard-five-delta-76.vercel.app/api/auth";
+// const BASE_URL = "http://localhost:5173/api/auth"
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {

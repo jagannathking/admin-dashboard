@@ -1,15 +1,14 @@
 const express = require("express");
-const { getAllUsers, getUserProfile, createUser,updateUser, deleteUser } = require("../controllers/user.controller");
+const { getAllUsers, getUserProfile, createUser, updateUser, deleteUser } = require("../controllers/user.controller");
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Admin can create Users or Managers
-// Admin Routes
-router.post("/create", authMiddleware(["Admin"]), createUser);
-router.put("/update/:id", authMiddleware(["Admin"]), updateUser);
-router.delete("/delete/:id", authMiddleware(["Admin"]), deleteUser);
-router.get("/", authMiddleware(["Admin"]), getAllUsers);
-router.get("/profile", authMiddleware(["Admin", "Manager", "Employee"]), getUserProfile);
+router.get("/", authMiddleware({ roles: ["Admin"] }), getAllUsers);
+router.get("/profile", authMiddleware({ roles: ["Admin", "Manager", "Employee"] }), getUserProfile);
+
+router.post("/create", authMiddleware({ roles: ["Admin"] }), createUser);
+router.put("/update/:id", authMiddleware({ roles: ["Admin"] }), updateUser);
+router.delete("/delete/:id", authMiddleware({ roles: ["Admin"] }), deleteUser);
 
 module.exports = router;
