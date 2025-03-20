@@ -75,21 +75,7 @@ const Home = () => {
                 Track projects, collaborate with your team, and achieve your
                 goals all in one place.
               </p>
-              <div className="space-x-4">
-                <button className="bg-white text-blue-600 px-4 py-2 rounded-md font-medium hover:bg-blue-50 transition duration-150">
-                  Create Project
-                </button>
-                <button className="bg-blue-700 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-800 transition duration-150">
-                  View Dashboard
-                </button>
-              </div>
-            </div>
-            <div className="hidden md:block md:w-1/2">
-              <img
-                src="/api/placeholder/600/400"
-                alt="Dashboard Preview"
-                className="rounded-lg shadow-lg mt-8 md:mt-0"
-              />
+              <div className="space-x-4"></div>
             </div>
           </div>
         </div>
@@ -156,46 +142,6 @@ const Home = () => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Recent activity section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Recent Activity
-        </h2>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <ul className="divide-y divide-gray-200">
-            {recentActivity.map((activity) => (
-              <li
-                key={activity.id}
-                className="p-4 hover:bg-gray-50 transition duration-150"
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 mr-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                      {activity.user.charAt(0)}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-900">
-                      <span className="font-medium">{activity.user}</span>{" "}
-                      <span className="text-gray-500">{activity.action}</span>{" "}
-                      <span className="font-medium">{activity.task}</span>
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {activity.time}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 text-sm text-center">
-            <button className="text-blue-600 font-medium hover:text-blue-800 transition ">
-              View all activity
-            </button>
-          </div>
         </div>
       </div>
     </div>

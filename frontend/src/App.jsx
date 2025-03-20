@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from './components/NabBar'
 import NavRoutes from './routes/NavRoutes'
-
+import Footer from './pages/Footer'
 const App = () => {
   return (
     <>
@@ -10,6 +10,10 @@ const App = () => {
 
      {/* Nav Routes */}
      <NavRoutes />
+
+
+     {/* Footer */}
+     {/* <Footer /> */}
     </>
   )
 }
