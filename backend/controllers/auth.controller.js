@@ -1,8 +1,6 @@
-// auth.controller.js
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/User"); // Import the User model
 
 exports.register = async (req, res) => {
     try {
@@ -16,18 +14,14 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "Invalid role" });
         }
 
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         const newUser = new User({
             name,
             email,
-            password: hashedPassword, // Store the HASHED password
+            password,
             role,
         });
 
-        await newUser.save();
+        await newUser.save(); // The 'save' middleware in UserSchema will handle the hashing
         res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
         console.error("Registration error:", error);
@@ -43,7 +37,8 @@ exports.login = async (req, res) => {
         if (!user)
             return res.status(400).json({ message: "Invalid credentials" });
 
-        const isMatch = await bcrypt.compare(password, user.password); // Compare plain text password with hashed password
+        // Use the comparePassword method defined in the schema
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
             return res.status(400).json({ message: "Invalid credentials" });
 

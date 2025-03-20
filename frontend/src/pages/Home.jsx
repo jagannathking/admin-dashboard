@@ -192,7 +192,7 @@ const Home = () => {
             ))}
           </ul>
           <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 text-sm text-center">
-            <button className="text-blue-600 font-medium hover:text-blue-800 transition duration-150">
+            <button className="text-blue-600 font-medium hover:text-blue-800 transition ">
               View all activity
             </button>
           </div>
