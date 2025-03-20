@@ -10,7 +10,6 @@ const UserSchema = new mongoose.Schema({
     enum: ["Admin", "Manager", "Employee"], 
     required: true,
   },
-  permissions: [String]
 });
 
 // Hash password before saving

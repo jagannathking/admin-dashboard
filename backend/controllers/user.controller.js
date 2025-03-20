@@ -1,3 +1,4 @@
+// user.controller.js
 const User = require("../models/User");
 
 exports.getAllUsers = async (req, res) => {
@@ -18,31 +19,38 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-// Admin can create Users or Managers
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
     // Only Admin can create a new user
     if (req.user.role !== "Admin") {
-      return res.status(403).json({ message: "Access Denied. Only Admin can create users." });
+      return res.status(403).json({
+        message: "Access Denied. Only Admin can create users.",
+      });
     }
 
     // Check if the role exists
     const roleData = await Role.findOne({ name: role });
     if (!roleData) {
-      return res.status(400).json({ message: "Invalid role. Role must be either 'User' or 'Manager'." });
+      return res
+        .status(400)
+        .json({ message: "Invalid role. Role must be either 'User' or 'Manager'." });
     }
 
     // Only allow 'User' or 'Manager' roles
     if (!["User", "Manager"].includes(role)) {
-      return res.status(403).json({ message: "Admins can only create 'User' or 'Manager' accounts." });
+      return res.status(403).json({
+        message: "Admins can only create 'User' or 'Manager' accounts.",
+      });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User with this email already exists." });
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists." });
     }
 
     // Create new user
@@ -55,12 +63,10 @@ exports.createUser = async (req, res) => {
 
     await newUser.save();
     res.status(201).json({ message: "User created successfully by Admin." });
-
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 
 exports.updateUser = async (req, res) => {
   try {
@@ -69,7 +75,9 @@ exports.updateUser = async (req, res) => {
 
     // Only Admin can update users
     if (req.user.role !== "Admin") {
-      return res.status(403).json({ message: "Access Denied. Only Admin can update users." });
+      return res.status(403).json({
+        message: "Access Denied. Only Admin can update users.",
+      });
     }
 
     // Check if the user exists
@@ -82,7 +90,9 @@ exports.updateUser = async (req, res) => {
     if (role) {
       const validRoles = ["User", "Manager"];
       if (!validRoles.includes(role)) {
-        return res.status(400).json({ message: "Invalid role. Only 'User' or 'Manager' roles are allowed." });
+        return res
+          .status(400)
+          .json({ message: "Invalid role. Only 'User' or 'Manager' roles are allowed." });
       }
     }
 
@@ -93,12 +103,10 @@ exports.updateUser = async (req, res) => {
 
     await user.save();
     res.status(200).json({ message: "User updated successfully." });
-
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 
 exports.deleteUser = async (req, res) => {
   try {
@@ -106,7 +114,9 @@ exports.deleteUser = async (req, res) => {
 
     // Only Admin can delete users
     if (req.user.role !== "Admin") {
-      return res.status(403).json({ message: "Access Denied. Only Admin can delete users." });
+      return res.status(403).json({
+        message: "Access Denied. Only Admin can delete users.",
+      });
     }
 
     // Check if the user exists
@@ -118,7 +128,6 @@ exports.deleteUser = async (req, res) => {
     // Delete the user
     await user.deleteOne();
     res.status(200).json({ message: "User deleted successfully." });
-
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
