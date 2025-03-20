@@ -1,46 +1,76 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
-  const { user } = useAuth(); // No logout here
-  const VITE_API_URL = "https://book-management-seven-sepia.vercel.app/api";
+  const { user } = useAuth();
+  const VITE_API_URL = "https://admin-dashboard-five-delta-76.vercel.app/api";
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState({ message: "", type: "" });
+
+  useEffect(() => {
+    if (user?.role === "Admin") {
+      console.log("User Token:", user?.token); // Debugging line
+      fetchUsers();
+    }
+  }, [user, VITE_API_URL]);
+
+  // Create user form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "User", // Default role for new users created by Admin
-  });
-  const [selectedUser, setSelectedUser] = useState(null); // For update
-  const [updateFormData, setUpdateFormData] = useState({
-    // for update user, it does not affect to form data
-    name: "",
-    email: "",
     role: "User",
   });
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(`${VITE_API_URL}/users`, {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch users: ${response.status}`);
-        }
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        alert("Failed to load users.");
-      }
-    };
+  // Edit user form state
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [updateFormData, setUpdateFormData] = useState({
+    name: "",
+    email: "",
+    role: "", // Changed back to string to match the User model
+  });
 
-    fetchUsers();
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${VITE_API_URL}/users/`, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUsers(data);
+      setError(null);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setError("Failed to load users. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Call fetchUsers only if user has "Admin" role
+    if (user?.role === "Admin") {
+      fetchUsers();
+    }
   }, [user, VITE_API_URL]);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification({ message: "", type: "" });
+    }, 3000);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,22 +90,23 @@ const AdminDashboard = () => {
       });
 
       const result = await response.json();
+
       if (response.ok) {
-        alert("User created successfully!");
+        fetchUsers(); // after create refrsh
+
+        showNotification("User created successfully!");
         setFormData({
           name: "",
           email: "",
           password: "",
           role: "User",
         });
-        // Refresh user list after creating a new user
-        fetchUsers();
       } else {
-        alert(result.message || "Failed to create user.");
+        showNotification(result.message || "Failed to create user.", "error");
       }
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Something went wrong. Please try again.");
+      showNotification("Something went wrong. Please try again.", "error");
     }
   };
 
@@ -90,16 +121,15 @@ const AdminDashboard = () => {
         });
 
         if (response.ok) {
-          alert("User deleted successfully!");
-          // Refresh user list after deleting a user
+          showNotification("User deleted successfully!");
           fetchUsers();
         } else {
           const result = await response.json();
-          alert(result.message || "Failed to delete user.");
+          showNotification(result.message || "Failed to delete user.", "error");
         }
       } catch (error) {
         console.error("Error deleting user:", error);
-        alert("Something went wrong. Please try again.");
+        showNotification("Something went wrong. Please try again.", "error");
       }
     }
   };
@@ -134,104 +164,195 @@ const AdminDashboard = () => {
       );
 
       const result = await response.json();
+
       if (response.ok) {
-        alert("User updated successfully!");
+        showNotification("User updated successfully!");
         setSelectedUser(null);
         setUpdateFormData({
           name: "",
           email: "",
-          role: "User",
+          role: "", // set to string for update
         });
-        // Refresh data
-        fetchUsers();
+        fetchUsers(); // refresh
       } else {
-        alert(result.message || "Failed to update user.");
+        showNotification(result.message || "Failed to update user.", "error");
       }
     } catch (error) {
       console.error("Error updating user:", error);
-      alert("Something went wrong. Please try again.");
+      showNotification("Something went wrong. Please try again.", "error");
     }
   };
 
   return (
-    <div>
+    <div className="admin-dashboard">
       <h2>Admin Dashboard</h2>
-      <h3>Create New User</h3>
-      <form onSubmit={handleCreateUser}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="User">User</option>
-          <option value="Manager">Manager</option>
-        </select>
-        <button type="submit">Create User</button>
-      </form>
 
-      <h3>User List</h3>
-      <ul>
-        {users.map((userItem) => (
-          <li key={userItem._id}>
-            {userItem.name} ({userItem.email}) - Role: {userItem.role}
-            <button onClick={() => handleEditUser(userItem)}>Edit</button>
-            <button onClick={() => handleDeleteUser(userItem._id)}>
-              Delete
+      {/* Notification Component */}
+      {notification.message && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
+
+      <div className="dashboard-container">
+        <div className="form-container">
+          <h3>Create New User</h3>
+          <form onSubmit={handleCreateUser} className="user-form">
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="role">Role</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+              >
+                <option value="User">User</option>
+                <option value="Manager">Manager</option>
+              </select>
+            </div>
+
+            <button type="submit" className="btn btn-primary">
+              Create User
             </button>
-          </li>
-        ))}
-      </ul>
+          </form>
+        </div>
+
+        <div className="user-list-container">
+          <h3>User List</h3>
+
+          {isLoading && <div className="loading">Loading users...</div>}
+
+          {error && <div className="error-message">{error}</div>}
+
+          {!isLoading && !error && users.length === 0 && (
+            <div className="no-users">No users found.</div>
+          )}
+
+          <ul className="user-list">
+            {users.map((userItem) => (
+              <li key={userItem._id} className="user-item">
+                <div className="user-info">
+                  <span className="user-name">{userItem.name}</span>
+                  <span className="user-email">({userItem.email})</span>
+                  <span className="user-role">Role: {userItem.role}</span>
+                </div>
+                <div className="user-actions">
+                  <button
+                    onClick={() => handleEditUser(userItem)}
+                    className="btn btn-edit"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteUser(userItem._id)}
+                    className="btn btn-delete"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       {selectedUser && (
-        <div>
-          <h3>Edit User</h3>
-          <form onSubmit={handleUpdateUser}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={updateFormData.name}
-              onChange={handleUpdateFormDataChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={updateFormData.email}
-              onChange={handleUpdateFormDataChange}
-              required
-            />
-            <select
-              name="role"
-              value={updateFormData.role}
-              onChange={handleUpdateFormDataChange}
-            >
-              <option value="User">User</option>
-              <option value="Manager">Manager</option>
-            </select>
-            <button type="submit">Update User</button>
-          </form>
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Edit User</h3>
+            <form onSubmit={handleUpdateUser} className="user-form">
+              <div className="form-group">
+                <label htmlFor="update-name">Name</label>
+                <input
+                  id="update-name"
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={updateFormData.name}
+                  onChange={handleUpdateFormDataChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="update-email">Email</label>
+                <input
+                  id="update-email"
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={updateFormData.email}
+                  onChange={handleUpdateFormDataChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="update-role">Role</label>
+                <select
+                  id="update-role"
+                  name="role"
+                  value={updateFormData.role}
+                  onChange={handleUpdateFormDataChange}
+                >
+                  <option value="User">User</option>
+                  <option value="Manager">Manager</option>
+                </select>
+              </div>
+
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary">
+                  Update User
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedUser(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
