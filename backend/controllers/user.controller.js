@@ -87,3 +87,22 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+
+
+// user.controller.js
+exports.getAllEmployeesForManager = async (req, res) => {
+  try {
+    // Verify is Manager
+    if (req.user.role !== "Manager") {
+      return res.status(403).json({ message: "Acess denied, only Manager" });
+    }
+
+    // Find all users with the role "Employee"
+    const employees = await User.find({ role: "Employee" }).populate("role");  // Use .find instead of .findById
+    res.json(employees);
+  } catch (error) {
+    console.error("Error getting employees:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};

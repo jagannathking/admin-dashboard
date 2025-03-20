@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     name: "",
     email: "",
     password: "",
-    role: "User",
+    role: "Employee", // Now defaults to "Employee"
   });
 
   // Edit user form state
@@ -31,9 +31,10 @@ const AdminDashboard = () => {
   const [updateFormData, setUpdateFormData] = useState({
     name: "",
     email: "",
-    role: "", // Changed back to string to match the User model
+    role: "",
   });
 
+  // fetch data all users
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
@@ -99,7 +100,7 @@ const AdminDashboard = () => {
           name: "",
           email: "",
           password: "",
-          role: "User",
+          role: "Employee", // Keep it “Employee" to prevent backend break
         });
       } else {
         showNotification(result.message || "Failed to create user.", "error");
@@ -110,6 +111,7 @@ const AdminDashboard = () => {
     }
   };
 
+  // Delete user
   const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
@@ -245,7 +247,7 @@ const AdminDashboard = () => {
                 value={formData.role}
                 onChange={handleChange}
               >
-                <option value="User">User</option>
+                <option value="Employee">Employee</option>
                 <option value="Manager">Manager</option>
               </select>
             </div>
