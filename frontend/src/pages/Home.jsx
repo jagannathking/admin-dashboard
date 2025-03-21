@@ -112,38 +112,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Featured content section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Featured Content
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredContent.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mb-2">
-                  {item.category}
-                </span>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600 mb-4">{item.description}</p>
-                <button className="text-blue-600 font-medium hover:text-blue-800 transition duration-150">
-                  Learn more →
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+     
     </div>
   );
 };
